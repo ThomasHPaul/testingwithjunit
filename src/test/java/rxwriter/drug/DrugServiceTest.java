@@ -1,8 +1,6 @@
 package rxwriter.drug;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.*;
 import rxwriter.drug.database.DrugRecord;
 import rxwriter.drug.database.DrugSource;
@@ -12,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("DrugService should ")
 class DrugServiceTest implements DrugSource {
 
     private DrugService drugService;
@@ -23,6 +22,7 @@ class DrugServiceTest implements DrugSource {
 
     @Test
     @Tag("database")
+    @DisplayName("return drugs from the database sorted by drug name")
      void drugsAreReturnedSorted() {
         List<DispensableDrug> foundDrugs = drugService.findDrugsStartingWith("as");
         assertNotNull(foundDrugs);
@@ -31,13 +31,26 @@ class DrugServiceTest implements DrugSource {
         assertEquals("aspirin", foundDrugs.get(1).drugName());
     }
 
-    @Test
-    void throwsExceptionOnEmptyStartsWith() {
-        assertThrows(IllegalArgumentException.class, ()->drugService.findDrugsStartingWith(" "));
+    @Nested
+    @DisplayName("throw an illegal argument exception")
+    class ThrowsExceptionTests {
+        @Test
+        @DisplayName("when passed a blank string for startingWith")
+        void throwsExceptionOnBlankStartsWith() {
+            assertThrows(IllegalArgumentException.class, ()->drugService.findDrugsStartingWith(" "));
+        }
+
+        @Test
+        @DisplayName("when passed an empty string for startingWith")
+        void throwsExceptionOnEmptyStartsWith() {
+            assertThrows(IllegalArgumentException.class, ()->drugService.findDrugsStartingWith(""));
+        }
     }
+
 
     @Test
     @Tag("database")
+    @DisplayName("return dispensable drugs with all properties set correctly from database")
     void setsDrugPropertiesCorrectly() {
         List<DispensableDrug> foundDrugs = drugService.findDrugsStartingWith("aspirin");
         DispensableDrug drug = foundDrugs.get(0);
