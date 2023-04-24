@@ -1,7 +1,9 @@
 package rxwriter.drug;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import rxwriter.drug.database.DrugDatabase;
+import org.junit.jupiter.api.condition.*;
 import rxwriter.drug.database.DrugRecord;
 import rxwriter.drug.database.DrugSource;
 
@@ -12,10 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DrugServiceTest implements DrugSource {
 
+    private DrugService drugService;
+
+    @BeforeEach
+    void setup() {
+        drugService = new DrugService(this);
+    }
+
     @Test
-    void drugsAreReturnedSorted() {
-        DrugService service = new DrugService(this);
-        List<DispensableDrug> foundDrugs = service.findDrugsStartingWith("as");
+    @Tag("database")
+     void drugsAreReturnedSorted() {
+        List<DispensableDrug> foundDrugs = drugService.findDrugsStartingWith("as");
         assertNotNull(foundDrugs);
         assertEquals(2, foundDrugs.size());
         assertEquals("asmanex", foundDrugs.get(0).drugName());
@@ -24,14 +33,13 @@ class DrugServiceTest implements DrugSource {
 
     @Test
     void throwsExceptionOnEmptyStartsWith() {
-        DrugService service = new DrugService(this);
-        assertThrows(IllegalArgumentException.class, ()->service.findDrugsStartingWith(" "));
+        assertThrows(IllegalArgumentException.class, ()->drugService.findDrugsStartingWith(" "));
     }
 
     @Test
+    @Tag("database")
     void setsDrugPropertiesCorrectly() {
-        DrugService service = new DrugService(this);
-        List<DispensableDrug> foundDrugs = service.findDrugsStartingWith("aspirin");
+        List<DispensableDrug> foundDrugs = drugService.findDrugsStartingWith("aspirin");
         DispensableDrug drug = foundDrugs.get(0);
 
         DrugClassification[] expectedClassifications = new DrugClassification[] {
